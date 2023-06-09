@@ -1,0 +1,7 @@
+/client/shop/node_modules
+/client/shop/build
+/client/shop/.env
+
+/server/node_modules
+/server/.env
+/server/logs.log
