@@ -1,15 +1,16 @@
 import HeaderMenu from "./components/HeaderMenu";
-import HeroBullets from "./components/HeroBullets";
 import FooterLinks from "./components/FooterLinks";
-import ArticlesCardsGrid from "./components/ArticlesCardsGrid";
+import AppRouter from "./components/AppRouter";
+import { BrowserRouter } from "react-router-dom";
 
 function App() {
   return (
     <>
-      <HeaderMenu/>
-      <HeroBullets/>
-      <ArticlesCardsGrid/>
-      <FooterLinks/>
+      <BrowserRouter>
+        <HeaderMenu/>
+        <AppRouter />
+        <FooterLinks/>
+      </BrowserRouter>
     </>
   );
 }

@@ -99,6 +99,9 @@ export default function HeaderMenu() {
             <a href="https://example.com" className={classes.link}>
               Cart(0)
             </a>
+            <a href="https://example.com" className={classes.link}>
+              Dashboard
+            </a>
           </Group>
 
           <Group className={classes.hiddenMobile}>
