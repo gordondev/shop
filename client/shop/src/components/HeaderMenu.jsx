@@ -13,6 +13,7 @@ import {
 import { MantineLogo } from '@mantine/ds';
 import { useDisclosure } from '@mantine/hooks';
 import AuthenticationModal from './AuthenticationModal';
+import { CART_ROUTE, CATEGORIES_ROUTE, DASHBOARD_ROUTE, MAIN_ROUTE, PRODUCTS_ROUTE, PROFILE_ROUTE } from "../utils/consts";
 
 const useStyles = createStyles((theme) => ({
   link: {
@@ -87,19 +88,19 @@ export default function HeaderMenu() {
           <MantineLogo size={30} />
 
           <Group sx={{ height: '100%' }} spacing={0} className={classes.hiddenMobile}>
-            <a href="https://example.com" className={classes.link}>
+            <a href={ MAIN_ROUTE } className={classes.link}>
               Home
             </a>
-            <a href="https://example.com" className={classes.link}>
+            <a href={ PRODUCTS_ROUTE } className={classes.link}>
               All products
             </a>
-            <a href="https://example.com" className={classes.link}>
+            <a href={ CATEGORIES_ROUTE } className={classes.link}>
               Categories
             </a>
-            <a href="https://example.com" className={classes.link}>
+            <a href={ CART_ROUTE } className={classes.link}>
               Cart(0)
             </a>
-            <a href="https://example.com" className={classes.link}>
+            <a href={ DASHBOARD_ROUTE } className={classes.link}>
               Dashboard
             </a>
           </Group>

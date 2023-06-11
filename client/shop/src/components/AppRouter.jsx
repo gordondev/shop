@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 // import { Context } from "../index";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { publicRoutes } from "../routes";
-import { MAIN_ROUTE, CATEGORIES_ROUTE } from "../utils/consts";
+import { MAIN_ROUTE } from "../utils/consts";
 import { observer } from "mobx-react-lite";
 
 const AppRouter = observer(() => {

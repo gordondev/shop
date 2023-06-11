@@ -6,7 +6,7 @@ const Main = () => {
 	return (
 		<>
 			<HeroBullets/>
-      		<ArticlesCardsGrid/>		
+      		<ArticlesCardsGrid/>
 		</>
 	)
 }
