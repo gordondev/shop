@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   Modal,
   TextInput,
@@ -10,9 +9,14 @@ import {
 } from '@mantine/core';
 import { useToggle, upperFirst } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
+import { registration } from "../http/userAPI";
+import React, { useState, useContext } from "react";
+import { notifications } from '@mantine/notifications';
 
 function AuthenticationModal({ opened, onClose }) {
   const [type, toggle] = useToggle(['login', 'register']);
+  const [loading, setLoading] = useState(false);
+
   const form = useForm({
     initialValues: {
       email: '',
@@ -27,9 +31,29 @@ function AuthenticationModal({ opened, onClose }) {
     },
   });
 
+  const sendDataForRegistration = async (values) => {
+    setLoading(true);
+    console.log("send");
+    try {
+      let data = await registration(values);
+      // user.setUser(data.user);
+      // user.setIsAuth(true);
+      // user.setRole(data.role);
+      // navigate(MAIN_ROUTE);
+    } catch (e) {
+      notifications.show({ title: e.response?.data?.error, color: 'red', });
+      e.response?.data?.errors.map((i) => {
+        notifications.show({ title: e.response?.data?.error, message: i.message, color: 'red', });
+      });
+      console.log(e.response?.data);
+      // message.error(e.response?.data?.message);
+    }
+    setLoading(false);
+  };
+
   return (
     <Modal opened={opened} onClose={onClose} title={upperFirst(type)} centered>
-      <form onSubmit={form.onSubmit(() => {})}>
+      <form onSubmit={form.onSubmit(() => sendDataForRegistration(form.values))}>
         <Stack>
           {type === 'register' && (
             <TextInput

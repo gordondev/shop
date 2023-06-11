@@ -14,6 +14,7 @@ import { MantineLogo } from '@mantine/ds';
 import { useDisclosure } from '@mantine/hooks';
 import AuthenticationModal from './AuthenticationModal';
 import { CART_ROUTE, CATEGORIES_ROUTE, DASHBOARD_ROUTE, MAIN_ROUTE, PRODUCTS_ROUTE, PROFILE_ROUTE } from "../utils/consts";
+import React, { useState, useContext } from "react";
 
 const useStyles = createStyles((theme) => ({
   link: {
@@ -79,6 +80,7 @@ export default function HeaderMenu() {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
   const { classes, theme } = useStyles();
   const [opened, { open, close }] = useDisclosure(false);
+  const [loading, setIsLoading] = useState();
 
   return (
     <Box pb={120}>
