@@ -9,19 +9,15 @@ class UserController {
         return;
       }
       const userData = await userService.registration(email, password, firstName);
-      this.setRefreshTokenCookie(res, userData.refreshToken);
+      res.cookie("refreshToken", userData.refreshToken, {
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        secure: true
+      });
       return res.json(userData);
     } catch (error) {
       next(error);
     }
-  }
-
-  setRefreshTokenCookie(res, refreshToken) {
-    res.cookie("refreshToken", refreshToken, {
-      maxAge: 30 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      secure: true
-    });
   }
 
   async login(req, res, next) {
@@ -32,7 +28,11 @@ class UserController {
         return;
       }
       const userData = await userService.login(email, password);
-      this.setRefreshTokenCookie(res, userData.refreshToken);
+      res.cookie("refreshToken", userData.refreshToken, {
+        maxAge: 30 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        secure: true
+      });
       return res.json(userData);
     } catch (error) {
       next(error);

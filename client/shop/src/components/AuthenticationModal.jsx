@@ -9,58 +9,71 @@ import {
 } from '@mantine/core';
 import { useToggle, upperFirst } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
-import { registration } from "../http/userAPI";
-import React, { useState, useContext } from "react";
+import { registration, login } from "../http/userAPI";
+import React, { useState, useContext, useEffect } from "react";
 import { notifications } from '@mantine/notifications';
 
 function AuthenticationModal({ opened, onClose }) {
   const [type, toggle] = useToggle(['login', 'register']);
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    form.reset();
+  }, [type]);
+
   const form = useForm({
     initialValues: {
       email: '',
-      name: '',
+      firstName: '',
       password: '',
-      terms: true,
     },
 
     validate: {
       email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Invalid email'),
-      password: (val) => (val.length <= 6 ? 'Password should include at least 6 characters' : null),
+      password: (val) => (val.length < 8 || val.length > 32 ? 'Пароль должен состоять от 6 до 32 символов' : null),
     },
   });
 
-  const sendDataForRegistration = async (values) => {
+  const sendData = async (values) => {
     setLoading(true);
-    console.log("send");
     try {
-      let data = await registration(values);
+      if (type === 'register') {
+        let data = await registration(values);
+        notifications.show({ title: 'Пользователь успешно зарегестрирован', color: 'green' });
+      } else {
+        let data = await login(values);
+        notifications.show({ title: 'Добро пожаловать!', color: 'green' });
+      }
+
       // user.setUser(data.user);
       // user.setIsAuth(true);
       // user.setRole(data.role);
-      // navigate(MAIN_ROUTE);
     } catch (e) {
-      notifications.show({ title: e.response?.data?.error, color: 'red', });
-      e.response?.data?.errors.map((i) => {
-        notifications.show({ title: e.response?.data?.error, message: i.message, color: 'red', });
-      });
-      console.log(e.response?.data);
-      // message.error(e.response?.data?.message);
+      if (e.response?.data?.message) {
+        notifications.show({ title: e.response?.data?.message, color: 'red', });
+      }
+      if (e.response?.data?.error) {
+        notifications.show({ title: e.response?.data?.error, color: 'red', });
+      }
+      if (e.response?.data?.errors) {
+        e.response?.data?.errors.map((i) => {
+          notifications.show({ title: e.response?.data?.error, message: i.message, color: 'red', });
+        });
+      }
     }
     setLoading(false);
   };
 
   return (
     <Modal opened={opened} onClose={onClose} title={upperFirst(type)} centered>
-      <form onSubmit={form.onSubmit(() => sendDataForRegistration(form.values))}>
+      <form onSubmit={form.onSubmit(() => sendData(form.values))}>
         <Stack>
           {type === 'register' && (
             <TextInput
               label="Name"
               placeholder="Your name"
-              value={form.values.name}
-              onChange={(event) => form.setFieldValue('name', event.currentTarget.value)}
+              value={form.values.firstName}
+              onChange={(event) => form.setFieldValue('firstName', event.currentTarget.value)}
               radius="md"
             />
           )}
@@ -81,7 +94,7 @@ function AuthenticationModal({ opened, onClose }) {
             placeholder="Your password"
             value={form.values.password}
             onChange={(event) => form.setFieldValue('password', event.currentTarget.value)}
-            error={form.errors.password && 'Password should include at least 6 characters'}
+            error={form.errors.password && 'Пароль должен состоять от 6 до 32 символов'}
             radius="md"
           />
         </Stack>
@@ -99,7 +112,7 @@ function AuthenticationModal({ opened, onClose }) {
                 ? 'Already have an account? Login'
                 : "Don't have an account? Register"}
             </Anchor>
-            <Button type="submit" radius="xl">
+            <Button type="submit" radius="xl" loading={loading} loaderPosition="right">
               {upperFirst(type)}
             </Button>
           </Group>
