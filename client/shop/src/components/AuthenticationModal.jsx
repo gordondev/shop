@@ -10,11 +10,13 @@ import {
 import { useToggle, upperFirst } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { registration, login } from "../http/userAPI";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { notifications } from '@mantine/notifications';
+import { Context } from "../index";
 
 function AuthenticationModal({ opened, onClose }) {
   const [type, toggle] = useToggle(['login', 'register']);
+  const { user } = useContext(Context);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -71,9 +73,10 @@ function AuthenticationModal({ opened, onClose }) {
   };
 
 const handleSuccess = (data) => {
-  // user.setUser(data.user);
-  // user.setIsAuth(true);
-  // user.setRole(data.role);
+  console.log(data);
+  user.setUser(data);
+  user.setIsAuth(true);
+  user.setRole(data.role);
 };
 
 const handleErrors = (e) => {

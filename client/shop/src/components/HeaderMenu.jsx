@@ -9,12 +9,16 @@ import {
   Drawer,
   ScrollArea,
   rem,
+  Menu
 } from '@mantine/core';
 import { MantineLogo } from '@mantine/ds';
 import { useDisclosure } from '@mantine/hooks';
 import AuthenticationModal from './AuthenticationModal';
 import { CART_ROUTE, CATEGORIES_ROUTE, DASHBOARD_ROUTE, MAIN_ROUTE, PRODUCTS_ROUTE, PROFILE_ROUTE } from "../utils/consts";
 import React, { useState, useContext } from "react";
+import { Context } from "../index";
+import { IconLogout, IconUserCircle } from '@tabler/icons-react';
+import UserButton from './UserButton';
 
 const useStyles = createStyles((theme) => ({
   link: {
@@ -81,11 +85,13 @@ export default function HeaderMenu() {
   const { classes, theme } = useStyles();
   const [opened, { open, close }] = useDisclosure(false);
   const [loading, setIsLoading] = useState();
+  const { user } = useContext(Context);
+  console.log(user);
 
   return (
     <Box pb={120}>
 
-      <Header height={60} px="md">
+      <Header height={80} px="md">
         <Group position="apart" sx={{ height: '100%' }}>
           <MantineLogo size={30} />
 
@@ -109,7 +115,27 @@ export default function HeaderMenu() {
 
           <Group className={classes.hiddenMobile}>
             <AuthenticationModal opened={opened} onClose={close} />
-            <Button onClick={open}>Войти</Button>
+            {
+              user.isAuth ? (
+                <Menu>
+                  <Menu.Target>
+                    <UserButton
+                      image="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=255&q=80"
+                      name={user?.user?.firstName}
+                      email={user?.user?.email}
+                    />
+                  </Menu.Target>
+                  <Menu.Dropdown>
+                    <Menu.Item icon={<IconUserCircle size={rem(14)} />} >
+                      Профиль
+                    </Menu.Item>
+                    <Menu.Item icon={<IconLogout size={rem(14)} />} >
+                      Выйти
+                    </Menu.Item>
+                  </Menu.Dropdown>
+                </Menu>
+              ) : <Button onClick={open}>Войти</Button>
+            }
           </Group>
 
           <Burger opened={drawerOpened} onClick={toggleDrawer} className={classes.hiddenDesktop} />
@@ -142,7 +168,9 @@ export default function HeaderMenu() {
 
           <Group position="center" grow pb="xl" px="md">
             <AuthenticationModal opened={opened} onClose={close} />
-            <Button onClick={open}>Войти</Button>
+            {
+              user.isAuth ? "Авторизован" : <Button onClick={open}>Войти</Button>
+            }
           </Group>
         </ScrollArea>
       </Drawer>
