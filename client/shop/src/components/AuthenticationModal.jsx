@@ -10,7 +10,7 @@ import {
 import { useToggle, upperFirst } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
 import { registration, login } from "../http/userAPI";
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { notifications } from '@mantine/notifications';
 
 function AuthenticationModal({ opened, onClose }) {
@@ -29,40 +29,70 @@ function AuthenticationModal({ opened, onClose }) {
     },
 
     validate: {
-      email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Invalid email'),
-      password: (val) => (val.length < 8 || val.length > 32 ? 'Пароль должен состоять от 6 до 32 символов' : null),
+      firstName: (val) => {
+        if (val.length < 2 || val.length > 32) {
+          return 'Имя должно содержать от 2 до 32 символов';
+        }
+        if (!/^[a-zA-Zа-яА-ЯёЁ]+$/.test(val)) {
+          return 'Имя должно состоять только из букв';
+        }
+        return null;
+      },
+      email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Некорректный email'),
+      password: (val) => {
+        if (val.length < 8 || val.length > 32) {
+          return 'Пароль должен состоять от 6 до 32 символов';
+        }
+        if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*()])/.test(val)) {
+          return 'Пароль должен содержать как минимум одну заглавную букву, одну строчную букву, одну цифру и один специальный символ: !@#$%^&*()';
+        }
+        return null;
+      },
     },
   });
 
   const sendData = async (values) => {
     setLoading(true);
     try {
+      let data;
       if (type === 'register') {
-        let data = await registration(values);
-        notifications.show({ title: 'Пользователь успешно зарегестрирован', color: 'green' });
+        data = await registration(values);
+        notifications.show({ title: 'Пользователь успешно зарегистрирован', color: 'green' });
       } else {
-        let data = await login(values);
+        data = await login(values);
         notifications.show({ title: 'Добро пожаловать!', color: 'green' });
       }
 
-      // user.setUser(data.user);
-      // user.setIsAuth(true);
-      // user.setRole(data.role);
+      handleSuccess(data);
     } catch (e) {
-      if (e.response?.data?.message) {
-        notifications.show({ title: e.response?.data?.message, color: 'red', });
-      }
-      if (e.response?.data?.error) {
-        notifications.show({ title: e.response?.data?.error, color: 'red', });
-      }
-      if (e.response?.data?.errors) {
-        e.response?.data?.errors.map((i) => {
-          notifications.show({ title: e.response?.data?.error, message: i.message, color: 'red', });
-        });
-      }
+      handleErrors(e);
     }
     setLoading(false);
   };
+
+const handleSuccess = (data) => {
+  // user.setUser(data.user);
+  // user.setIsAuth(true);
+  // user.setRole(data.role);
+};
+
+const handleErrors = (e) => {
+  const { response } = e;
+  if (response && response.data) {
+    const { data } = response;
+    if (data.message) {
+      notifications.show({ title: data.message, color: 'red' });
+    }
+    if (data.error) {
+      notifications.show({ title: data.error, color: 'red' });
+    }
+    if (data.errors) {
+      data.errors.forEach(({ message }) => {
+        notifications.show({ title: data.error, message, color: 'red' });
+      });
+    }
+  }
+};
 
   return (
     <Modal opened={opened} onClose={onClose} title={upperFirst(type)} centered>
@@ -70,10 +100,12 @@ function AuthenticationModal({ opened, onClose }) {
         <Stack>
           {type === 'register' && (
             <TextInput
+              required
               label="Name"
               placeholder="Your name"
               value={form.values.firstName}
               onChange={(event) => form.setFieldValue('firstName', event.currentTarget.value)}
+              error={form.errors.firstName}
               radius="md"
             />
           )}
@@ -84,7 +116,7 @@ function AuthenticationModal({ opened, onClose }) {
             placeholder="hello@mantine.dev"
             value={form.values.email}
             onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
-            error={form.errors.email && 'Invalid email'}
+            error={form.errors.email}
             radius="md"
           />
 
@@ -94,7 +126,7 @@ function AuthenticationModal({ opened, onClose }) {
             placeholder="Your password"
             value={form.values.password}
             onChange={(event) => form.setFieldValue('password', event.currentTarget.value)}
-            error={form.errors.password && 'Пароль должен состоять от 6 до 32 символов'}
+            error={form.errors.password}
             radius="md"
           />
         </Stack>
