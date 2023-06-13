@@ -146,10 +146,12 @@ function AuthenticationModal({ opened, onClose }) {
             radius="md"
           />
         </Stack>
-        <Button variant="light" color="gray" onClick={generatePassword} size="xs">
-          Сгенерировать пароль
-          <IconPassword />
-        </Button>
+        {type === 'register' && (
+          <Button variant="light" radius="xl" mt="xl" color="gray" onClick={generatePassword} size="xs">
+            Сгенерировать пароль
+            <IconPassword />
+          </Button>
+        )}
         <Stack position="apart" mt="xl">
           <Group position="apart" mt="xl">
             <Anchor
