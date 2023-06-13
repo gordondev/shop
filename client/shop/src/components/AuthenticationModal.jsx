@@ -5,19 +5,20 @@ import {
   Anchor,
   Button,
   Stack,
-  Group
+  Group,
 } from '@mantine/core';
 import { useToggle, upperFirst } from '@mantine/hooks';
 import { useForm } from '@mantine/form';
-import { registration, login } from "../http/userAPI";
-import React, { useState, useEffect, useContext } from "react";
+import { registration, login } from '../http/userAPI';
+import React, { useEffect, useContext } from 'react';
+import { Context } from '../index';
 import { notifications } from '@mantine/notifications';
-import { Context } from "../index";
+import { IconPassword } from '@tabler/icons-react';
+import { generateValidPassword } from '../utils/passwordUtils';
 
 function AuthenticationModal({ opened, onClose }) {
   const [type, toggle] = useToggle(['login', 'register']);
   const { user } = useContext(Context);
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     form.reset();
@@ -29,9 +30,8 @@ function AuthenticationModal({ opened, onClose }) {
       firstName: '',
       password: '',
     },
-
     validate: {
-      firstName: (val) => {
+      firstName: function (val) {
         if (val.length < 2 || val.length > 32) {
           return 'Имя должно содержать от 2 до 32 символов';
         }
@@ -40,8 +40,10 @@ function AuthenticationModal({ opened, onClose }) {
         }
         return null;
       },
-      email: (val) => (/^\S+@\S+$/.test(val) ? null : 'Некорректный email'),
-      password: (val) => {
+      email: function (val) {
+        return /^\S+@\S+$/.test(val) ? null : 'Некорректный email';
+      },
+      password: function (val) {
         if (val.length < 8 || val.length > 32) {
           return 'Пароль должен состоять от 6 до 32 символов';
         }
@@ -53,8 +55,12 @@ function AuthenticationModal({ opened, onClose }) {
     },
   });
 
-  const sendData = async (values) => {
-    setLoading(true);
+  const generatePassword = function () {
+    const password = generateValidPassword(12);
+    form.setFieldValue('password', password);
+  };
+
+  const sendData = async function (values) {
     try {
       let data;
       if (type === 'register') {
@@ -66,40 +72,41 @@ function AuthenticationModal({ opened, onClose }) {
       }
 
       handleSuccess(data);
-    } catch (e) {
-      handleErrors(e);
+    } catch (error) {
+      handleErrors(error);
     }
-    setLoading(false);
   };
 
-const handleSuccess = (data) => {
-  console.log(data);
-  user.setUser(data);
-  user.setIsAuth(true);
-  user.setRole(data.role);
-};
+  const handleSuccess = function (data) {
+    console.log(data);
+    user.setUser(data);
+    user.setIsAuth(true);
+    user.setRole(data.role);
+  };
 
-const handleErrors = (e) => {
-  const { response } = e;
-  if (response && response.data) {
-    const { data } = response;
-    if (data.message) {
-      notifications.show({ title: data.message, color: 'red' });
+  const handleErrors = function (error) {
+    const { response } = error;
+    if (response && response.data) {
+      const { data } = response;
+      if (data.message) {
+        notifications.show({ title: data.message, color: 'red' });
+      }
+      if (data.error) {
+        notifications.show({ title: data.error, color: 'red' });
+      }
+      if (data.errors) {
+        data.errors.forEach(function ({ message }) {
+          notifications.show({ title: data.error, message, color: 'red' });
+        });
+      }
     }
-    if (data.error) {
-      notifications.show({ title: data.error, color: 'red' });
-    }
-    if (data.errors) {
-      data.errors.forEach(({ message }) => {
-        notifications.show({ title: data.error, message, color: 'red' });
-      });
-    }
-  }
-};
+  };
 
   return (
     <Modal opened={opened} onClose={onClose} title={upperFirst(type)} centered>
-      <form onSubmit={form.onSubmit(() => sendData(form.values))}>
+      <form onSubmit={form.onSubmit(function () {
+        return sendData(form.values);
+      })}>
         <Stack>
           {type === 'register' && (
             <TextInput
@@ -107,7 +114,9 @@ const handleErrors = (e) => {
               label="Name"
               placeholder="Your name"
               value={form.values.firstName}
-              onChange={(event) => form.setFieldValue('firstName', event.currentTarget.value)}
+              onChange={function (event) {
+                return form.setFieldValue('firstName', event.currentTarget.value);
+              }}
               error={form.errors.firstName}
               radius="md"
             />
@@ -118,7 +127,9 @@ const handleErrors = (e) => {
             label="Email"
             placeholder="hello@mantine.dev"
             value={form.values.email}
-            onChange={(event) => form.setFieldValue('email', event.currentTarget.value)}
+            onChange={function (event) {
+              return form.setFieldValue('email', event.currentTarget.value);
+            }}
             error={form.errors.email}
             radius="md"
           />
@@ -128,26 +139,29 @@ const handleErrors = (e) => {
             label="Password"
             placeholder="Your password"
             value={form.values.password}
-            onChange={(event) => form.setFieldValue('password', event.currentTarget.value)}
+            onChange={function (event) {
+              return form.setFieldValue('password', event.currentTarget.value);
+            }}
             error={form.errors.password}
             radius="md"
           />
         </Stack>
-
+        <Button variant="light" color="gray" onClick={generatePassword} size="xs">
+          Сгенерировать пароль
+          <IconPassword />
+        </Button>
         <Stack position="apart" mt="xl">
           <Group position="apart" mt="xl">
             <Anchor
               component="button"
               type="button"
               color="dimmed"
-              onClick={() => toggle()}
+              onClick={toggle}
               size="xs"
             >
-              {type === 'register'
-                ? 'Already have an account? Login'
-                : "Don't have an account? Register"}
+              {type === 'register' ? 'Already have an account? Login' : "Don't have an account? Register"}
             </Anchor>
-            <Button type="submit" radius="xl" loading={loading} loaderPosition="right">
+            <Button type="submit" radius="xl" loading={form.loading} loaderPosition="right">
               {upperFirst(type)}
             </Button>
           </Group>
