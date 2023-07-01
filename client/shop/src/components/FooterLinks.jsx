@@ -103,19 +103,19 @@ const data = [
       "title": "About",
       "links": [
         {
-          "label": "Features",
+          "label": "Home",
           "link": "#"
         },
         {
-          "label": "Pricing",
+          "label": "All products",
           "link": "#"
         },
         {
-          "label": "Support",
+          "label": "Categories",
           "link": "#"
         },
         {
-          "label": "Forums",
+          "label": "Cart",
           "link": "#"
         }
       ]
@@ -150,14 +150,14 @@ export default function FooterLinks() {
         <div className={classes.logo}>
           <MantineLogo size={30} />
           <Text size="xs" color="dimmed" className={classes.description}>
-            Build fully functional accessible web applications faster than ever
+            У нас лучшие продукты
           </Text>
         </div>
         <div className={classes.groups}>{groups}</div>
       </Container>
       <Container className={classes.afterFooter}>
         <Text color="dimmed" size="sm">
-          © 2020 mantine.dev. All rights reserved.
+          © 2020 mantine.dev. Все права защищены.
         </Text>
 
         <Group spacing={0} className={classes.social} position="right" noWrap>
