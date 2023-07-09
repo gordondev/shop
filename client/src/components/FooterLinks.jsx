@@ -157,7 +157,7 @@ export default function FooterLinks() {
       </Container>
       <Container className={classes.afterFooter}>
         <Text color="dimmed" size="sm">
-          © 2020 mantine.dev. Все права защищены.
+          © 2023 mantine.dev. Все права защищены.
         </Text>
 
         <Group spacing={0} className={classes.social} position="right" noWrap>
