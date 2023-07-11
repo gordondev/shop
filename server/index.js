@@ -7,9 +7,11 @@ const cookieParser = require('cookie-parser');
 const sequelize = require("./db");
 const router = require("./routes/index");
 const errorMiddleware = require("./middlewares/error-middleware");
+const requestIp = require('request-ip');
 
 const PORT = process.env.PORT || 5000;
 
+app.use(requestIp.mw());
 app.use(
   cors({
     credentials: true,
@@ -18,6 +20,7 @@ app.use(
 );
 app.use(cookieParser());
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 app.use("/api", router);
 app.use(errorMiddleware);
 app.get("/", (req, res) => {

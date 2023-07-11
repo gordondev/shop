@@ -78,7 +78,6 @@ function AuthenticationModal({ opened, onClose }) {
   };
 
   const handleSuccess = function (data) {
-    console.log(data);
     user.setUser(data);
     user.setIsAuth(true);
     user.setRole(data.role);

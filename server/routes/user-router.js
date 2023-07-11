@@ -39,6 +39,6 @@ router.post(
 );
 router.post("/login", userController.login);
 router.post("/logout", userController.logout);
-router.get("/refresh-token", userController.refresh);
+router.get("/refresh", userController.refresh);
 
 module.exports = router;

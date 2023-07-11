@@ -1,6 +1,6 @@
 const sequelize = require("../db");
 const { DataTypes } = require("sequelize");
-const { Token } = require('./token-model');
+const { Session } = require('./session-model');
 
 const User = sequelize.define("users", {
   id: { type: DataTypes.INTEGER, primaryKey: true, autoIncrement: true },
@@ -13,7 +13,7 @@ const User = sequelize.define("users", {
   isBlocked: { type: DataTypes.BOOLEAN, defaultValue: false },
 });
 
-User.hasMany(Token);
-Token.belongsTo(User);
+User.hasMany(Session);
+Session.belongsTo(User);
 
 module.exports = { User };

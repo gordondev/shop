@@ -7,3 +7,10 @@
 .link-card:hover {
     color: red;
 }
+
+.loader-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh; /* Регулируйте высоту по вашему усмотрению */
+}

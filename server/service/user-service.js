@@ -41,7 +41,7 @@ class UserService {
     });
   }
 
-  async registration(email, password, firstName) {
+  async registration(email, password, firstName, deviceInfo) {
     try {
       await this.checkExistingUser(email);
 
@@ -49,13 +49,13 @@ class UserService {
       const hashedPassword = await this.hashPassword(password, salt);
       const user = await this.createUser(email, hashedPassword, firstName);
       const userDto = new UserDto(user);
-      const tokens = tokenService.generateTokens({ ...userDto }, salt);
+      const tokens = tokenService.generateTokens({ ...userDto });
 
-      await tokenService.saveToken(userDto.id, tokens.refreshToken, salt);
+      await tokenService.saveToken(userDto.id, tokens.refreshToken, deviceInfo);
 
       logger.info('Пользователь успешно зарегистрирован', { email, firstName });
 
-      return { ...tokens, user: userDto, deviceId: salt };
+      return { ...tokens, user: userDto };
     } catch (error) {
       logger.error('Ошибка при регистрации пользователя', { message: error.message, stack: error.stack });
 
@@ -79,13 +79,13 @@ class UserService {
 
       const salt = await generateSalt();
       const userDto = new UserDto(existingUser);
-      const tokens = tokenService.generateTokens({ ...userDto }, salt);
+      const tokens = tokenService.generateTokens({ ...userDto });
 
-      await tokenService.saveToken(existingUser.id, tokens.refreshToken, salt);
+      await tokenService.saveToken(existingUser.id, tokens.refreshToken);
 
       logger.info('Пользователь успешно авторизован', { email });
 
-      return { ...tokens, user: userDto, deviceId: salt };
+      return { ...tokens, user: userDto };
     } catch (error) {
       logger.error('Ошибка авторизации', { message: error.message, stack: error.stack });
 
@@ -102,9 +102,9 @@ class UserService {
     return token;
   }
 
-  async refresh(refreshToken, deviceId) {
+  async refresh(refreshToken, deviceInfo) {
     try {
-      const newTokens = await tokenService.refreshTokens(refreshToken, deviceId);
+      const newTokens = await tokenService.refreshTokens(refreshToken, deviceInfo);
       return newTokens;
     } catch (error) {
       logger.error('Ошибка при обновлении токенов', { message: error.message, stack: error.stack });
