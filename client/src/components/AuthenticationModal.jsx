@@ -13,7 +13,7 @@ import { registration, login } from '../http/userAPI';
 import React, { useEffect, useContext } from 'react';
 import { Context } from '../index';
 import { notifications } from '@mantine/notifications';
-import { IconPassword } from '@tabler/icons-react';
+import { IconKey } from '@tabler/icons-react';
 import { generateValidPassword } from '../utils/passwordUtils';
 
 function AuthenticationModal({ opened, onClose }) {
@@ -27,19 +27,9 @@ function AuthenticationModal({ opened, onClose }) {
   const form = useForm({
     initialValues: {
       email: '',
-      firstName: '',
       password: '',
     },
     validate: {
-      firstName: function (val) {
-        if (val.length < 2 || val.length > 32) {
-          return 'Имя должно содержать от 2 до 32 символов';
-        }
-        if (!/^[a-zA-Zа-яА-ЯёЁ]+$/.test(val)) {
-          return 'Имя должно состоять только из букв';
-        }
-        return null;
-      },
       email: function (val) {
         return /^\S+@\S+$/.test(val) ? null : 'Некорректный email';
       },
@@ -110,20 +100,6 @@ function AuthenticationModal({ opened, onClose }) {
         return sendData(form.values);
       })}>
         <Stack>
-          {type === 'register' && (
-            <TextInput
-              required
-              label="Nickname"
-              placeholder="Your nickname"
-              value={form.values.firstName}
-              onChange={function (event) {
-                return form.setFieldValue('firstName', event.currentTarget.value);
-              }}
-              error={form.errors.firstName}
-              radius="md"
-            />
-          )}
-
           <TextInput
             required
             label="Email"
@@ -160,7 +136,7 @@ function AuthenticationModal({ opened, onClose }) {
         {type === 'register' && (
           <Button variant="light" radius="xl" mt="xl" color="gray" onClick={generatePassword} size="xs">
             Сгенерировать пароль
-            <IconPassword />
+            <IconKey />
           </Button>
         )}
         <Stack position="apart" mt="xl">
