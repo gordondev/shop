@@ -1,25 +1,7 @@
 import React from 'react'
-import { Text, Paper, Container, Avatar, Group, Table, Flex, Button } from '@mantine/core';
-
-const elements = [
-  { position: 6, mass: 12.011, symbol: 'C', name: 'Carbon' },
-  { position: 7, mass: 14.007, symbol: 'N', name: 'Nitrogen' },
-  { position: 39, mass: 88.906, symbol: 'Y', name: 'Yttrium' },
-  { position: 56, mass: 137.33, symbol: 'Ba', name: 'Barium' },
-  { position: 58, mass: 140.12, symbol: 'Ce', name: 'Cerium' },
-];
+import { Text, Paper, Container, Avatar, Group, Flex, Button, Title } from '@mantine/core';
 
 const Profile = () => {
-
-	const rows = elements.map((element) => (
-	    <tr key={element.name}>
-		    <td>{element.position}</td>
-		    <td>{element.name}</td>
-		    <td>{element.symbol}</td>
-		    <td>{element.mass}</td>
-	    </tr>
-	));
-
 	return (
 		<Container py="xl">
 			<Paper shadow="sm" radius="md" p="lg" mb={20}>
@@ -36,9 +18,7 @@ const Profile = () => {
 					    >
 					  		<Text fz="xl">Nickname</Text>
 					  		<Group spacing="xs">
-					      		<Text>Кутузов</Text>
-					      		<Text>Сергей</Text>
-					      		<Text>Михайлович</Text>
+					      		<Text c="dimmed">usr.@mail.ru</Text>
 				      		</Group>
 		      			</Flex>
 		      	</Group>
@@ -46,20 +26,30 @@ const Profile = () => {
 		    </Group>
 		    </Paper>
 		    <Paper shadow="sm" radius="md" p="lg" mb={20}>
-		    	<Text ta="center">Дата регистрации: 26.05.2002</Text>
+				<Title order={3} style={{ marginBottom: '20px' }} ta="center">
+					Сессии
+				</Title>
+				<Paper radius="md" p="lg" mb={15} withBorder>
+					<Group position="apart">
+						<Text>Desktop</Text>
+						<Button color="red">Выйти</Button>
+					</Group>
+				</Paper>
+				<Paper radius="md" p="lg" mb={15} withBorder>
+					<Group position="apart">
+						<Text>Desktop</Text>
+						<Button color="red">Выйти</Button>
+					</Group>
+				</Paper>
+				<Paper radius="md" p="lg" withBorder>
+					<Group position="apart">
+						<Text>Desktop</Text>
+						<Button color="red">Выйти</Button>
+					</Group>
+				</Paper>
 		    </Paper>
-		    <Paper shadow="sm" radius="md" p="lg">
-				<Table horizontalSpacing="xl" verticalSpacing="md" fontSize="md">
-					<thead>
-				        <tr>
-				          <th>Устройство</th>
-				          <th>IP</th>
-				          <th>Браузер</th>
-				          <th></th>
-				        </tr>
-				    </thead>
-			       <tbody>{rows}</tbody>
-			    </Table>
+			<Paper shadow="sm" radius="md" p="lg">
+		    	<Text ta="center">Дата регистрации: 26.05.2002</Text>
 		    </Paper>
 	    </Container>
 	)
