@@ -4,7 +4,7 @@ import { Text, Paper, Container, Avatar, Group, Flex, Button, Title } from '@man
 const Profile = () => {
 	return (
 		<Container py="xl">
-			<Paper shadow="sm" radius="md" p="lg" mb={20}>
+			<Paper shadow="sm" radius="md" p="lg" mb={20} withBorder>
 			<Group position="apart">
 				<Group>
 			  		<Avatar size="xl" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=250&q=80" />
@@ -25,7 +25,7 @@ const Profile = () => {
 		      	<Button>Редактировать</Button>
 		    </Group>
 		    </Paper>
-		    <Paper shadow="sm" radius="md" p="lg" mb={20}>
+		    <Paper shadow="sm" radius="md" p="lg" mb={20} withBorder>
 				<Title order={3} style={{ marginBottom: '20px' }} ta="center">
 					Сессии
 				</Title>
@@ -48,7 +48,7 @@ const Profile = () => {
 					</Group>
 				</Paper>
 		    </Paper>
-			<Paper shadow="sm" radius="md" p="lg">
+			<Paper shadow="sm" radius="md" p="lg" withBorder>
 		    	<Text ta="center">Дата регистрации: 26.05.2002</Text>
 		    </Paper>
 	    </Container>
