@@ -52,12 +52,15 @@ function AuthenticationModal({ opened, onClose }) {
         }
         return null;
       },
+      confirmPassword: (value, values) =>
+      value !== values.password ? 'Пароли не совпадают' : null,
     },
   });
 
   const generatePassword = function () {
     const password = generateValidPassword(12);
     form.setFieldValue('password', password);
+    form.setFieldValue('confirmPassword', password);
   };
 
   const sendData = async function (values) {
@@ -110,8 +113,8 @@ function AuthenticationModal({ opened, onClose }) {
           {type === 'register' && (
             <TextInput
               required
-              label="Name"
-              placeholder="Your name"
+              label="Nickname"
+              placeholder="Your nickname"
               value={form.values.firstName}
               onChange={function (event) {
                 return form.setFieldValue('firstName', event.currentTarget.value);
@@ -141,9 +144,18 @@ function AuthenticationModal({ opened, onClose }) {
             onChange={function (event) {
               return form.setFieldValue('password', event.currentTarget.value);
             }}
+            {...form.getInputProps('password')}
             error={form.errors.password}
             radius="md"
           />
+          {type === 'register' && (
+            <PasswordInput
+              required
+              label="Confirm password"
+              placeholder="Confirm password"
+              {...form.getInputProps('confirmPassword')}
+            />
+          )}
         </Stack>
         {type === 'register' && (
           <Button variant="light" radius="xl" mt="xl" color="gray" onClick={generatePassword} size="xs">
