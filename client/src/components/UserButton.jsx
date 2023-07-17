@@ -3,7 +3,7 @@ import { IconChevronRight } from '@tabler/icons-react';
 import { Group, Avatar, Text, Menu, UnstyledButton } from '@mantine/core';
 
 const UserButton = forwardRef(function UserButton(
-  { image, name, email, icon, ...others },
+  { image, nickname, email, icon, ...others },
   ref
 ) {
   return (
@@ -28,7 +28,7 @@ const UserButton = forwardRef(function UserButton(
 
         <div style={{ flex: 1 }}>
           <Text size="sm" weight={500}>
-            {name}
+            {nickname}
           </Text>
 
           <Text color="dimmed" size="xs">

@@ -1,10 +1,8 @@
 const Router = require("express");
 const router = new Router();
-const commonPasswords = require("../utils/commonPasswords");
 const userController = require("../controllers/user-controller");
 const { body } = require("express-validator");
 const { validateRequest } = require("../middlewares/validation-middleware");
-const { authMiddleware } = require("../middlewares/auth-middleware");
 
 router.post(
   "/registration",
@@ -19,20 +17,8 @@ router.post(
       .withMessage("Пароль должен содержать хотя бы одну заглавную букву")
       .matches(/[0-9]/)
       .withMessage("Пароль должен содержать хотя бы одну цифру")
-      .matches(/[!@#$%^&*()]/)
+      .matches(/[!@#$%^&*()."']/)
       .withMessage("Пароль должен содержать хотя бы один специальный символ")
-      .custom((value, { req }) => {
-        if (value.toLowerCase().includes(req.body.firstName.toLowerCase())) {
-          throw new Error("Пароль не должен содержать имя пользователя");
-        }
-        return true;
-      })
-      .custom((value) => {
-        if (commonPasswords.includes(value.toLowerCase())) {
-          throw new Error("Используйте более надежный пароль");
-        }
-        return true;
-      }),
   ],
   validateRequest,
   userController.registration

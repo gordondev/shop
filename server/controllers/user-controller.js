@@ -37,8 +37,8 @@ class UserController {
 
   async registration(req, res, next) {
     try {
-      const { email, password, firstName } = req.body;
-      if (!firstName || !email || !password) {
+      const { email, password} = req.body;
+      if (!email || !password) {
         res.status(400).json({ error: 'Отсутствуют обязательные поля' });
         return;
       }
@@ -46,7 +46,7 @@ class UserController {
       const deviceInfo = getClientDeviceInfo(req);
       console.log("CLIENT DATA:\n", deviceInfo);
 
-      const userData = await userService.registration(email, password, firstName, deviceInfo);
+      const userData = await userService.registration(email, password, deviceInfo);
       res.cookie("refreshToken", userData.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,

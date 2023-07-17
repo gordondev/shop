@@ -11,16 +11,16 @@ class UserService {
   async checkExistingUser(email) {
     const existingUser = await User.findOne({ where: { email } });
     if (existingUser) {
-      throw ApiError.BadRequest('Пользователь с такой почтой уже существует');
       logger.warn('Пользователь с такой почтой уже существует', { email });
+      throw ApiError.BadRequest('Пользователь с такой почтой уже существует');
     }
   }
 
   async checkExistingUserForLogin(email) {
     const existingUser = await User.findOne({ where: { email } });
     if (!existingUser) {
-      throw ApiError.BadRequest('Пользователь не был найден');
       logger.warn('Пользователь не был найден', { email });
+      throw ApiError.BadRequest('Пользователь не был найден');
     }
     return existingUser;
   }
@@ -33,27 +33,59 @@ class UserService {
     return await argon2Utils.verifyPassword(password, hashedPassword);
   }
 
-  async createUser(email, hashedPassword, firstName) {
+  async createUser(email, hashedPassword, nickname) {
     return await User.create({
       email,
       password: hashedPassword,
-      firstName,
+      nickname,
     });
   }
 
-  async registration(email, password, firstName, deviceInfo) {
+  async isNicknameUnique(nickname) {
+    const existingUser = await User.findOne({ where: { nickname } });
+    return !existingUser;
+  }
+
+  async generateRandomString(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    const charactersLength = characters.length;
+  
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+  
+    return result;
+  }
+  
+  async generateUniqueNickname() {
+    const randomString = await this.generateRandomString(10);
+    const nickname = `User-${randomString}`;
+  
+    const isUnique = await this.isNicknameUnique(nickname);
+    if (!isUnique) {
+      return this.generateUniqueNickname();
+    }
+  
+    return nickname;
+  }
+
+  async registration(email, password, deviceInfo) {
     try {
       await this.checkExistingUser(email);
 
       const salt = await generateSalt();
       const hashedPassword = await this.hashPassword(password, salt);
-      const user = await this.createUser(email, hashedPassword, firstName);
+      const nickname = await this.generateUniqueNickname();
+
+      const user = await this.createUser(email, hashedPassword, nickname);
+      
       const userDto = new UserDto(user);
       const tokens = tokenService.generateTokens({ ...userDto });
 
       await tokenService.saveToken(userDto.id, tokens.refreshToken, deviceInfo);
 
-      logger.info('Пользователь успешно зарегистрирован', { email, firstName });
+      logger.info('Пользователь успешно зарегистрирован', { email, nickname });
 
       return { ...tokens, user: userDto };
     } catch (error) {
@@ -73,8 +105,8 @@ class UserService {
 
       const isPassEquels = await this.verifyPassword(password, existingUser.password);
       if (!isPassEquels) {
-        throw ApiError.InternalServerError('Неверный пароль');
         logger.warn('Неверный пароль', { email });
+        throw ApiError.InternalServerError('Неверный пароль');
       }
 
       const salt = await generateSalt();

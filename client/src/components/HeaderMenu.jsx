@@ -84,9 +84,7 @@ export default function HeaderMenu() {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] = useDisclosure(false);
   const { classes, theme } = useStyles();
   const [opened, { open, close }] = useDisclosure(false);
-  const [loading, setIsLoading] = useState();
   const { user } = useContext(Context);
-  console.log(user);
 
   return (
     <Box pb={120}>
@@ -121,7 +119,7 @@ export default function HeaderMenu() {
                   <Menu.Target>
                     <UserButton
                       image="https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=255&q=80"
-                      name={user?.user?.firstName}
+                      nickname={user?.user?.nickname}
                       email={user?.user?.email}
                     />
                   </Menu.Target>

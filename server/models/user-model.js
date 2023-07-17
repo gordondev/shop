@@ -7,9 +7,7 @@ const User = sequelize.define("users", {
   email: { type: DataTypes.STRING, unique: true },
   password: { type: DataTypes.STRING },
   role: { type: DataTypes.ENUM("USER", "ADMIN"), defaultValue: "USER" },
-  firstName: { type: DataTypes.STRING },
-  surname: { type: DataTypes.STRING },
-  secondName: { type: DataTypes.STRING },
+  nickname: { type: DataTypes.STRING },
   isBlocked: { type: DataTypes.BOOLEAN, defaultValue: false },
 });
 
