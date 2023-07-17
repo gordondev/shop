@@ -40,8 +40,8 @@ class TokenService {
     }
   }
 
-  async saveToken(userId, refreshToken, deviceInfo) {
-    const tokenData = await Session.findOne({ where: { userId } });
+  async saveToken(userId, refreshToken, deviceInfo, sessionID) {
+    const tokenData = await Session.findOne({ where: { id: sessionID, userId } });
     if (tokenData) {
       tokenData.refreshToken = refreshToken;
       tokenData.ip = deviceInfo.ipAddress;
@@ -50,12 +50,14 @@ class TokenService {
       return tokenData.save();
     }
     const token = await Session.create({ 
+      id: sessionID,
       userId,
       refreshToken,
       ip: deviceInfo.ipAddress,
       browser: deviceInfo.browser.name + deviceInfo.browser.version,
       device: deviceInfo.device.type + deviceInfo.device.model + deviceInfo.device.brand,
     });
+    console.log("\n\nTOKEN >>> ", token?.dataValues?.id);
     return token;
   }
 
@@ -66,31 +68,29 @@ class TokenService {
     return tokenData;
   }
 
-  async findToken(refreshToken) {
+  async findToken(refreshToken, sessionID) {
     const tokenData = await Session.findOne({
-      where: { refreshToken },
+      where: { id: sessionID, refreshToken },
     });
     return tokenData;
   }
 
-  async refreshTokens(refreshToken, deviceInfo) {
+  async refreshTokens(refreshToken, deviceInfo, sessionID) {
     if (!refreshToken) {
       throw ApiError.UnauthorizedError();
     }
     const userData = this.validateRefreshToken(refreshToken);
-    const tokenFromDB = this.findToken(refreshToken);
+    const tokenFromDB = this.findToken(refreshToken, sessionID);
 
     if (!userData || !tokenFromDB) {
       throw ApiError.UnauthorizedError();
     }
 
-    console.log("tokenData\n\n\n ", userData, "\n\n\n");
-
     const user = await User.findOne({ where: { id: userData.id } });
     const userDto = new UserDto(user);
     const newTokens = this.generateTokens({ ...userDto });
 
-    await this.saveToken(userDto.id, newTokens.refreshToken, deviceInfo);
+    await this.saveToken(userDto.id, newTokens.refreshToken, deviceInfo, sessionID);
 
     return { ...newTokens, user: userDto };
   }

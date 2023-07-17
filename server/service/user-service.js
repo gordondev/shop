@@ -2,7 +2,7 @@ const { User } = require('../models/user-model');
 const argon2Utils = require('../utils/argon2Utils');
 const ApiError = require('../exceptions/api-error');
 const logger = require('../utils/logger');
-const generateSalt = require('../utils/saltUtils');
+const { generateUniqueValue } = require('../utils/generateValueUtils');
 const UserDto = require("../dtos/user-dto");
 const tokenService = require("./token-service");
 const { InternalServerError } = require('../exceptions/api-error');
@@ -74,7 +74,8 @@ class UserService {
     try {
       await this.checkExistingUser(email);
 
-      const salt = await generateSalt();
+      const salt = await generateUniqueValue();
+      const sessionID = await generateUniqueValue();
       const hashedPassword = await this.hashPassword(password, salt);
       const nickname = await this.generateUniqueNickname();
 
@@ -83,11 +84,11 @@ class UserService {
       const userDto = new UserDto(user);
       const tokens = tokenService.generateTokens({ ...userDto });
 
-      await tokenService.saveToken(userDto.id, tokens.refreshToken, deviceInfo);
+      await tokenService.saveToken(userDto.id, tokens.refreshToken, deviceInfo, sessionID);
 
       logger.info('Пользователь успешно зарегистрирован', { email, nickname });
 
-      return { ...tokens, user: userDto };
+      return { ...tokens, user: userDto, sessionID };
     } catch (error) {
       logger.error('Ошибка при регистрации пользователя', { message: error.message, stack: error.stack });
 
@@ -99,25 +100,25 @@ class UserService {
     }
   }
 
-  async login(email, password) {
+  async login(email, password, deviceInfo) {
     try {
       const existingUser = await this.checkExistingUserForLogin(email);
-
       const isPassEquels = await this.verifyPassword(password, existingUser.password);
+
       if (!isPassEquels) {
         logger.warn('Неверный пароль', { email });
         throw ApiError.InternalServerError('Неверный пароль');
       }
 
-      const salt = await generateSalt();
+      const sessionID = await generateUniqueValue();
       const userDto = new UserDto(existingUser);
       const tokens = tokenService.generateTokens({ ...userDto });
 
-      await tokenService.saveToken(existingUser.id, tokens.refreshToken);
+      await tokenService.saveToken(existingUser.id, tokens.refreshToken, deviceInfo, sessionID);
 
       logger.info('Пользователь успешно авторизован', { email });
 
-      return { ...tokens, user: userDto };
+      return { ...tokens, user: userDto, sessionID };
     } catch (error) {
       logger.error('Ошибка авторизации', { message: error.message, stack: error.stack });
 
@@ -134,9 +135,9 @@ class UserService {
     return token;
   }
 
-  async refresh(refreshToken, deviceInfo) {
+  async refresh(refreshToken, deviceInfo, sessionID) {
     try {
-      const newTokens = await tokenService.refreshTokens(refreshToken, deviceInfo);
+      const newTokens = await tokenService.refreshTokens(refreshToken, deviceInfo, sessionID);
       return newTokens;
     } catch (error) {
       logger.error('Ошибка при обновлении токенов', { message: error.message, stack: error.stack });

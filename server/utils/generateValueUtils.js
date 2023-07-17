@@ -1,6 +1,6 @@
 const crypto = require('crypto');
 
-async function generateSalt() {
+async function generateUniqueValue() {
   return new Promise((resolve, reject) => {
     crypto.randomBytes(32, (err, buffer) => {
       if (err) {
@@ -12,5 +12,4 @@ async function generateSalt() {
     });
   });
 }
-
-module.exports = generateSalt;
+exports.generateUniqueValue = generateUniqueValue;

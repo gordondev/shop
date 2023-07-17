@@ -44,11 +44,15 @@ class UserController {
       }
 
       const deviceInfo = getClientDeviceInfo(req);
-      console.log("CLIENT DATA:\n", deviceInfo);
-
       const userData = await userService.registration(email, password, deviceInfo);
+
       res.cookie("refreshToken", userData.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        secure: true
+      });
+
+      res.cookie("sessionID", userData.sessionID, {
         httpOnly: true,
         secure: true
       });
@@ -66,12 +70,21 @@ class UserController {
         res.status(400).json({ error: 'Отсутствуют обязательные поля' });
         return;
       }
-      const userData = await userService.login(email, password);
+
+      const deviceInfo = getClientDeviceInfo(req);
+      const userData = await userService.login(email, password, deviceInfo);
+
       res.cookie("refreshToken", userData.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
         httpOnly: true,
         secure: true
       });
+
+      res.cookie("sessionID", userData.sessionID, {
+        httpOnly: true,
+        secure: true
+      });
+
       return res.json(userData);
     } catch (error) {
       next(error);
@@ -91,11 +104,10 @@ class UserController {
 
   async refresh(req, res, next) {
     try {
-      const { refreshToken } = req.cookies;
+      const { refreshToken, sessionID } = req.cookies;
       const deviceInfo = getClientDeviceInfo(req);
-
-      console.log("CLIENT DATA:\n", deviceInfo);
-      const userData = await userService.refresh(refreshToken, deviceInfo);
+      
+      const userData = await userService.refresh(refreshToken, deviceInfo, sessionID);
 
       res.cookie("refreshToken", userData.refreshToken, {
         maxAge: 30 * 24 * 60 * 60 * 1000,
